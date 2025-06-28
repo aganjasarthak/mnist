@@ -51,7 +51,6 @@
       border: 1px solid #ccc;
       object-fit: contain;
       max-width: 100%;
-      height: auto;
       width: 140px;
       height: 140px;
     }
@@ -104,6 +103,12 @@
       font-size: 1.2rem;
       font-weight: bold;
     }
+    #probs {
+      margin-top: 1rem;
+      text-align: left;
+      width: 100%;
+      max-width: 200px;
+    }
     .model-desc {
       text-align: left;
       width: 100%;
@@ -138,20 +143,19 @@
   <h1>MNIST Digit Classifier Prototype</h1>
   <h2 class="subtitle">Developed by Er. Sarthak Aganja (<a href="mailto:sarthak.aganja@icp.edu.np">sarthak.aganja@icp.edu.np</a>)</h2>
   <div class="container">
-    <!-- Prediction Card -->
     <div class="card previewer">
       <div>
         <input type="file" id="fileInput" accept="image/*" />
         <div class="note">⚠️ Image must be exactly 28×28 pixels.</div>
-        <a href="https://drive.google.com/drive/folders/1hWysYDWBBn0rJyLzv0kVhDEqHAGlmBFx?usp=sharing" target="_blank" class="drive-btn">Reference dataset of MNIST (Click here)</a>
+        <a href="https://drive.google.com/drive/folders/1hWysYDWBBn0rJyLzv0kVhDEqHAGlmBFx?usp=sharing" target="_blank" class="drive-btn">Reference dataset of MNIST</a>
       </div>
       <div id="error"></div>
       <img id="preview" src="" alt="Image preview" />
       <button id="predictBtn" disabled>Predict</button>
       <div id="result">Prediction: –</div>
+      <div id="probs"></div>
+      <a class="drive-link" href="https://drive.google.com/drive/folders/1hWysYDWBBn0rJyLzv0kVhDEqHAGlmBFx?usp=sharing" target="_blank">Model files on Google Drive</a>
     </div>
-
-    <!-- Model Description Card -->
     <div class="card model-desc">
       <h3>Model Architecture</h3>
       <p>For educational purposes, this CNN was built with TensorFlow/Keras as follows:</p>
@@ -185,6 +189,8 @@
       errorDiv.textContent = '';
       preview.src = '';
       btn.disabled = true;
+      document.getElementById('probs').innerHTML = '';
+      document.getElementById('result').textContent = 'Prediction: –';
       if (!file) return;
 
       const img = new Image();
@@ -224,7 +230,15 @@
       const output = model.predict(input);
       const probs  = await output.data();
       const pred   = probs.indexOf(Math.max(...probs));
+
       document.getElementById('result').innerText = `Prediction: ${pred}`;
+      const probsDiv = document.getElementById('probs');
+      let html = '<ul>';
+      probs.forEach((p,i) => {
+        html += `<li>Class ${i}: ${(p*100).toFixed(2)}%`;
+      });
+      html += '</ul>';
+      probsDiv.innerHTML = html;
 
       btn.textContent = 'Predict';
       btn.disabled = false;
